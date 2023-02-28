@@ -83,7 +83,7 @@ fn player_input_debug(
         commands.entity(entity).insert(TweenTransform::new(
             transform.to_owned(),
             Transform::from_translation(Vec3::new(64., 64., 0.)),
-            1.,
+            5.,
         ));
     }
 }
