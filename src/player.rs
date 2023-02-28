@@ -1,4 +1,7 @@
 use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
+use bevy_pancam::PanCam;
+
+use crate::tween::TweenTransform;
 
 pub struct PlayerPlugin;
 
@@ -7,6 +10,7 @@ impl Plugin for PlayerPlugin {
         app.add_startup_system(spawn_player)
             // .add_system(camera_follow)
             .add_system(player_movement)
+            .add_system(player_input_debug)
             .add_event::<ProcessTurn>();
     }
 }
@@ -21,7 +25,9 @@ fn spawn_player(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
-    commands.spawn(Camera2dBundle::default());
+    commands
+        .spawn(Camera2dBundle::default())
+        .insert(PanCam::default());
     commands
         .spawn(MaterialMesh2dBundle {
             mesh: meshes.add(Mesh::from(shape::Quad::default())).into(),
@@ -51,6 +57,7 @@ fn player_movement(
 
     if input.just_pressed(KeyCode::H) {
         player.translation.x -= 32.;
+        println!("POS: {:?}", player.translation);
     }
     if input.just_pressed(KeyCode::J) {
         player.translation.y -= 32.;
@@ -63,4 +70,20 @@ fn player_movement(
     }
 
     turn_event.send(ProcessTurn);
+}
+
+fn player_input_debug(
+    mut commands: Commands,
+    query: Query<(Entity, &Transform), With<Player>>,
+    input: Res<Input<KeyCode>>,
+) {
+    let (entity, transform) = query.single();
+
+    if input.just_pressed(KeyCode::T) {
+        commands.entity(entity).insert(TweenTransform::new(
+            transform.to_owned(),
+            Transform::from_translation(Vec3::new(64., 64., 0.)),
+            1.,
+        ));
+    }
 }
