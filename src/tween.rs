@@ -58,7 +58,7 @@ fn process_tween(
         transform.translation.x = x;
         transform.translation.y = y;
 
-        tween.counter += tween.duration * time.delta_seconds();
+        tween.counter += (1. / tween.duration) * time.delta_seconds();
 
         if tween.counter >= 1. {
             transform.translation = tween.end.translation;
